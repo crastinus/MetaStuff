@@ -50,38 +50,36 @@ Member<Class, T>& Member<Class, T>::addNonConstGetter(nonconst_ref_getter_func_p
 template <typename Class, typename T>
 const T& Member<Class, T>::get(const Class& obj) const
 {
+
+    assert(refGetterPtr || hasMemberPtr);
     if (refGetterPtr) {
         return (obj.*refGetterPtr)();
-    } else if (hasMemberPtr) {
+    } else { // if (hasMemberPtr) {
         return obj.*ptr;
-    } else {
-        assert(false);
     }
 }
 
 template <typename Class, typename T>
 T Member<Class, T>::getCopy(const Class& obj) const
 {
+    assert(refGetterPtr || valGetterPtr || hasMemberPtr);
     if (refGetterPtr) {
         return (obj.*refGetterPtr)();
     } else if (valGetterPtr) {
         return (obj.*valGetterPtr)();
-    } else if (hasMemberPtr) {
+    } else { // if (hasMemberPtr) {
         return obj.*ptr;
-    } else {
-        assert(false);
     }
 }
 
 template <typename Class, typename T>
-T& Member<Class, T>::getRef(Class& obj) const
-{
+T& Member<Class, T>::getRef(Class& obj) const {
+    assert(hasMemberPtr || nonConstRefGetterPtr);
     if (nonConstRefGetterPtr) {
-        (obj.*nonConstRefGetterPtr)();
-    } 
-    
-    assert(hasMemberPtr) ;
-    return obj.*ptr;
+        return (obj.*nonConstRefGetterPtr)();
+    } else {
+        return obj.*ptr;
+    }
 }
 
 template <typename Class, typename T>
@@ -101,9 +99,9 @@ void Member<Class, T>::set(Class& obj, V&& value) const
         (obj.*valSetterPtr)(value); // will copy value
     } else if (hasMemberPtr) {
         obj.*ptr = value;
-    } else {
+    } else 
         assert(false);
-    }
+    
 }
 
 template <typename Class, typename T>
